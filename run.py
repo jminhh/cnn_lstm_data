@@ -13,8 +13,12 @@ from keras.layers import Merge
 #from keras.layers.merge import Average
 from keras.optimizers import Adam
 from keras.callbacks import EarlyStopping
-from keras.utils import plot_model, np_utils
+from keras.utils import np_utils
+from keras.utils.vis_utils import plot_model, model_to_dot
+from keras import backend as K
 
+K.set_learning_phase(1) #set learning phase
+import pydotplus
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
@@ -113,6 +117,8 @@ def batch_iter(split_file):
                     seq_len = int(split_data[indices[i]][1])
                     y = int(split_data[indices[i]][2])
 
+
+
                     # To reduce the computational time, data augmentation is performed for each frame
                     augs_rgb = []
                     augs_flow = []
@@ -121,7 +127,7 @@ def batch_iter(split_file):
                         frame = int(seq_len / frames * j) + 1
 
                         # rgb image
-                        rgb_i = load_img("%s/img_%05d.jpg" % (image_dir, frame), target_size=(224, 224))
+                        rgb_i = load_img("%s/img/img_%05d.jpg" % (image_dir, frame), target_size=(224, 224))
                         rgb = img_to_array(rgb_i)
                         rgb_flip_i = rgb_i.transpose(Image.FLIP_LEFT_RIGHT) # augmentation
                         rgb_flip = img_to_array(rgb_flip_i)
@@ -129,8 +135,8 @@ def batch_iter(split_file):
                         augs_rgb.append([rgb, rgb_flip])
 
                         # flow image
-                        flow_x_i = load_img("%s/flow_x_%05d.jpg" % (image_dir, frame), target_size=(224, 224))
-                        flow_y_i = load_img("%s/flow_y_%05d.jpg" % (image_dir, frame), target_size=(224,224))
+                        flow_x_i = load_img("%s/flow_x/flow_x_%05d.jpg" % (image_dir, frame), target_size=(224, 224))
+                        flow_y_i = load_img("%s/flow_y/flow_y_%05d.jpg" % (image_dir, frame), target_size=(224, 224))
                         flow_x = img_to_array(flow_x_i)
                         flow_y = img_to_array(flow_y_i)
 
@@ -198,8 +204,8 @@ if __name__ == "__main__":
     split = args.split
 
     # Make split file path
-    train_split_file = "%s/%s_train_split_%s.txt" % (split_dir, dataset, split)
-    test_split_file = "%s/%s_val_split_%s.txt" % (split_dir, dataset, split)
+    train_split_file = "%s/ntu_train.txt" % (split_dir)
+    test_split_file = "%s/ntu_val.txt" % (split_dir)
 
     # Make directory
     if not os.path.exists("model"):
